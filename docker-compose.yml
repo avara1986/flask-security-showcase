@@ -1,4 +1,3 @@
-version: "3"
 services:
     showcase:
         build:
@@ -15,9 +14,9 @@ services:
           - DD_TRACE_AGENT_URL=http://ddagent:8126
           - DD_API_KEY=$DD_API_KEY
           - DD_SERVICE=albertovara_service_15
+          - DD_SERVICE=albertovara_service_iast_12
           - DD_TRACE_ENABLED=true
           - DD_APPSEC_ENABLED=true
-          - _DD_TELEMETRY_METRICS_ENABLED=true
           - DD_REMOTE_CONFIGURATION_ENABLED=false
           - DD_ENV=staging
           - DD_TRACE_DEBUG=true

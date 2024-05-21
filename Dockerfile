@@ -42,5 +42,5 @@ RUN pip install git+https://github.com/DataDog/dd-trace-py@avara1986/APPSEC-1234
 
 EXPOSE 8000
 
-# CMD ["ddtrace-run", "gunicorn", "--workers", "1", "--log-level", "INFO", "--bind", "0.0.0.0:8000", "app:app"]
-CMD ["ddtrace-run", "uwsgi", "--http", "0.0.0.0:8000", "--enable-threads", "--module", "app:app"]
+CMD ["ddtrace-run", "gunicorn", "--workers", "1", "--log-level", "INFO", "--bind", "0.0.0.0:8000", "app:app"]
+# CMD ["ddtrace-run", "uwsgi", "--http", "0.0.0.0:8000", "--enable-threads", "--module", "app:app"]
