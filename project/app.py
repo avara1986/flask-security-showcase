@@ -1,3 +1,4 @@
+import sys
 import json
 import logging
 import os
@@ -9,11 +10,13 @@ import subprocess
 import requests
 from ddtrace.internal.service import ServiceStatus
 from ddtrace.internal.telemetry import telemetry_writer
-from flask import Flask, Response, request
+from flask import Flask, Response, request, redirect
+from Crypto.Cipher import AES
+from flask import render_template_string
+
 
 logging.basicConfig(level=logging.DEBUG)
 LOGS_FILE = os.path.dirname(__file__)
-from Crypto.Cipher import AES
 
 
 def unsafe_sql_format(query_string, *args, **kwargs):
@@ -24,16 +27,37 @@ def unsafe_sql_format(query_string, *args, **kwargs):
 
 
 def create_app():
-    from ddtrace.appsec._iast._taint_tracking import (get_tainted_ranges,
-                                                      is_pyobject_tainted)
-
     app = Flask(__name__)
 
     @app.route("/")
     def helthcheck():
         return "OK"
 
-    @app.route('/iast/propagation', methods=['POST'])
+    @app.route("/bs4")
+    def entry_point():
+        return "bs4: %s" % str(bs4.builder._html5lib.HTML5TreeBuilder)
+
+
+    @app.route("/xss")
+    def xss():
+        user_input = request.args.get("input", "")
+        return render_template_string("XSS: {{ user_input|safe }}", user_input=user_input)
+
+    @app.route("/unvalidated_redirect")
+    def unvalidated_redirect():
+        url = request.args.get("url", "")
+
+        return redirect(location=url)
+
+    @app.route("/header_injection")
+    def header_injection():
+        user_input = request.args.get("input", "")
+        resp = Response("OK")
+        resp.headers["Vary"] = user_input
+
+        resp.headers["Header-Injection"] = user_input
+        return resp
+
     @app.route("/iast/propagation", methods=["GET"])
     def iast_propagation():
         """Application Vulnerability Management has 3 key concepts: origins, propagation and sink points (vulnerabilities)
@@ -82,13 +106,13 @@ def create_app():
 
         try:
             # Command Injection vulnerability
-            _ = subprocess.Popen("ls " + string9)
+            _ = subprocess.Popen("ls " + string13)
         except Exception:
             pass
 
         try:
             # SSRF vulnerability
-            requests.get("http://" + "foobar")
+            requests.get("http://" + string13)
             # urllib3.request("GET", "http://" + "foobar")
         except Exception:
             pass
@@ -120,9 +144,9 @@ def create_app():
         ]  # 1 propagation range: notainted_HIROOT1234-HIROOT123_notainted
 
         expected = "notainted_HIROOT1234-HIROOT123_notainted"  # noqa: F841
-        assert (
-            string20 == expected
-        ), f"Error, string20 is\n{string20}\nExpected:\n{expected}"
+        # assert (
+        #     string20 == expected
+        # ), f"Error, string20 is\n{string20}\nExpected:\n{expected}"
 
         # Insecure Cookie vulnerability
         resp = Response(

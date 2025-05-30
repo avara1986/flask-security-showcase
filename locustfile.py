@@ -1,4 +1,4 @@
-from locust import HttpUser, task, between
+from locust import HttpUser, between, task
 
 
 class QuickstartUser(HttpUser):
@@ -8,4 +8,10 @@ class QuickstartUser(HttpUser):
     def hello_world(self):
         self.client.get("/block", headers={"X-Forwarded-For": "123.45.67.89"})
         self.client.get("/")
-        self.client.get("/attack", headers={"X-Forwarded-For": "123.45.67.87", "User-Agent": "dd-test-scanner-log"})
+        self.client.get(
+            "/attack",
+            headers={
+                "X-Forwarded-For": "123.45.67.87",
+                "User-Agent": "dd-test-scanner-log",
+            },
+        )
