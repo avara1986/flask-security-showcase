@@ -8,5 +8,7 @@ nltk==3.8.1
 graphene-federation==0.2.0
 pandarallel==1.6.5
 werkzeug==2.0.3
-scipy==1.10.1
-ddtrace==2.21.1
+# Pinned intentionally — vulnerable to CVE-2024-35195, used by /sca_vulnerability for SCA reachability validation
+requests==2.2.0
+# Required only on Python 3.12+ where ssl.match_hostname was removed; vendored urllib3 in requests==2.2.0 falls back to this
+backports.ssl_match_hostname; python_version >= "3.12"

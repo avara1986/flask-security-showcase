@@ -37,6 +37,20 @@ def create_app():
     def entry_point():
         return "bs4: %s" % str(bs4.builder._html5lib.HTML5TreeBuilder)
 
+    @app.route("/sca_vulnerability")
+    def sca_vulnerability():
+        """Endpoint that exercises requests.Session.send (CVE-2024-35195 target)."""
+        import requests
+
+        session = requests.Session()
+        try:
+            # The SCA hook fires at Session.send entry — the actual request
+            # outcome doesn't matter for reachability detection.
+            session.get("http://localhost:1")
+        except Exception:
+            pass
+        return "OK_sca", 200
+
 
     @app.route("/xss")
     def xss():
