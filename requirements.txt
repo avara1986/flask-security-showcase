@@ -12,3 +12,4 @@ werkzeug==2.0.3
 requests==2.2.0
 # Required only on Python 3.12+ where ssl.match_hostname was removed; vendored urllib3 in requests==2.2.0 falls back to this
 backports.ssl_match_hostname; python_version >= "3.12"
+urllib3==2.4.0
